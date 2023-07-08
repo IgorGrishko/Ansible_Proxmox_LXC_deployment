@@ -152,7 +152,7 @@ Export environment variables for passwords.
 
 `export CONTAINER_PASSWORD="secret"`
 
-Stat playbook.
+Start playbook.
 
 `ansible-playbook main.yml`
 
