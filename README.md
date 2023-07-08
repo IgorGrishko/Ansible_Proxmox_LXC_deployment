@@ -72,6 +72,8 @@ Public key must be added to Proxmox host authorized_keys file located at `/root/
 
 After that Proxmox host can be connected with SSH without password.
 
+Also replace public key in `group_vars/all.yml` file.
+
 ### Proxmoxer installation.
 
 To send remote commands to Proxmox required to install Proxmoxer wrapper on the Proxmox host.
