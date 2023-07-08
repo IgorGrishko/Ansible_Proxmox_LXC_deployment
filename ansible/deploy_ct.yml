@@ -1,0 +1,55 @@
+---
+- name: Proxmox Ansible
+  hosts: proxmox-node1
+  # vars_files:
+  # - group_vars/all.yml
+
+  tasks:
+  - name: Create new container
+    community.general.proxmox:
+      description: Create container
+      api_user: "{{ container_api_user }}" #root@pam
+      api_password: '{{ lookup("env", "PROXMOX_PASSWORD") }}'
+      api_host: "{{ proxmox_ip }}"
+      node: "{{ container_node }}"
+      vmid: "{{ container_vmid }}"
+      hostname: "{{ container_hostname }}"
+      unprivileged: "{{ container_unprivileged }}"
+      password: '{{ lookup("env", "CONTAINER_PASSWORD") }}'
+      pubkey: "{{ container_pubkey }}"
+      ostemplate: "{{ container_ostemplate }}"
+      disk: "{{ container_disk }}"
+      cores: "{{ container_cores }}"
+      memory: "{{ container_memory }}"
+      swap: "{{ container_swap }}"
+      netif: "{{ container_netif }}"
+      nameserver: "{{ container_nameserver }}"
+      timezone: "{{ container_timezone }}"
+      features:
+        - "{{ container_feature_1 }}" #mount=nfs
+
+
+  - name: Start container
+    community.general.proxmox:
+      description: Start container
+      vmid: 200
+      api_user: "{{ container_api_user }}" #root@pam
+      api_password: '{{ lookup("env", "PROXMOX_PASSWORD") }}'
+      api_host: "{{ proxmox_ip }}"
+      state: started
+      timeout: 30
+
+  - name: Pause for 60 seconds
+    tags: sleep60
+    wait_for:
+      delay: 60
+      timeout: 0
+
+  - name: Test reachability to container
+    wait_for:
+      host: "{{ container_ip }}"
+      port: 22
+      delay: 5
+      state: started
+      timeout: 30
+...

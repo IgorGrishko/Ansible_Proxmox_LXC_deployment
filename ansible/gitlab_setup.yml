@@ -1,0 +1,27 @@
+---
+- name: Setup GitLab
+  hosts: gitlab
+
+  tasks:
+  - name: Copy GitLab configuration file
+    ansible.builtin.copy:
+      src: files/gitlab.rb
+      dest: /etc/gitlab/gitlab.rb
+      #owner: root
+      #group: root
+      mode: '0600'
+
+  - name: Create a directory for SSL certificates
+    ansible.builtin.file:
+      path: /etc/gitlab/ssl
+      state: directory
+      mode: '0755'
+
+  - name: Generate self-signed SSL certificates
+    shell:
+      cmd: openssl req -x509 -nodes -newkey rsa:2048 -keyout /etc/gitlab/ssl/gitlab.key -out /etc/gitlab/ssl/gitlab.crt -subj "/C=CA/ST=Quebec/L=Montreal/O=Example Company/CN=poxmox.example.com"
+
+  - name: Rebuild GitLab configuration
+    shell:
+      "gitlab-ctl reconfigure 2> /dev/null"
+...

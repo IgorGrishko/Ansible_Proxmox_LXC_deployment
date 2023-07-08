@@ -1,0 +1,35 @@
+---
+# Proxmox host IP
+proxmox_ip: 192.168.1.50
+proxmox_user: root
+
+# Containner IP
+container_ip: 192.168.1.60
+container_user: root
+
+# Container build values
+# General
+container_api_user: root@pam
+container_node: pve-host
+container_vmid: 200
+container_hostname: gitlab-ct
+container_unprivileged: false
+container_pubkey: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICjEY5FeImlxp19ggWnpKgYNP/BWe8y2XmgU+rTamx65 root@CT101'
+# Template
+container_ostemplate: 'local:vztmpl/debian-11-standard_11.3-1_amd64.tar.zst'
+# Disks
+container_disk: 'local-lvm:8'
+# CPU
+container_cores: 1
+# Memory
+container_memory: 4048
+container_swap: 4048
+# Network
+container_netif: '{"net0":"name=eth0,gw=192.168.1.1,ip=192.168.1.60/24,bridge=vmbr0"}'
+# DNS
+container_nameserver: 1.1.1.1
+# Time
+container_timezone: host
+# Features
+container_feature_1: mount=nfs
+...

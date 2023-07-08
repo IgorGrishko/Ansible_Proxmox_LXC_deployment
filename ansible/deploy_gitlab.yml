@@ -1,0 +1,72 @@
+---
+- name: Deploy GitLab
+  hosts: gitlab
+  
+  tasks:
+  - name: Update repo index for Debian
+    ansible.builtin.apt:
+      update_cache: true
+      cache_valid_time: 432000
+    when:
+      - ansible_facts['os_family'] == 'Debian'
+
+  - name: Update all packages to their latest version
+    ansible.builtin.apt:
+      name: "*"
+      state: latest
+
+  - name: Reboot the container
+    tags: reboot
+    shell: "reboot"
+    async: 1
+    poll: 0
+
+  - name: Wait for the reboot to complete
+    wait_for_connection:
+      connect_timeout: 30
+      sleep: 5
+      delay: 5
+      timeout: 60
+
+  - name: Install dependencies and NFS Client
+    ansible.builtin.package:
+      name:
+        - curl
+        - openssh-server
+        - ca-certificates
+        - perl
+        - nfs-common # to use NFS share
+      state: latest
+
+  - name: Create a directory for GitLab config
+    ansible.builtin.file:
+      path: "{{ item }}"
+      state: directory
+      mode: '0755'
+    loop:
+      - /etc/gitlab/
+      - /var/opt/gitlab/
+      - /var/log/gitlab/
+
+  - name: Mount NFS volumes for GitLab config
+    ansible.posix.mount:
+      src: "{{ item.remote }}" #192.168.1.205:/nfs/gitlab/config
+      path: "{{ item.local }}" #/etc/gitlab/
+      opts: rw,sync
+      state: mounted
+      fstype: nfs
+    loop:
+      - { remote: '192.168.1.205:/nfs/gitlab/config', local: '/etc/gitlab/' }
+      - { remote: '192.168.1.205:/nfs/gitlab/data', local: '/var/opt/gitlab/' }
+      - { remote: '192.168.1.205:/nfs/gitlab/logs', local: '/var/log/gitlab/' }
+
+  - name: Add the GitLab package repository
+    shell:
+      cmd: curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | bash
+
+  - name: Install GitLab
+    ansible.builtin.package:
+      name:
+        - gitlab-ce
+      state: latest
+...

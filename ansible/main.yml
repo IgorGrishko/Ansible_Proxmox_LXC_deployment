@@ -1,0 +1,8 @@
+---
+- name: Deploy container
+  import_playbook: deploy_ct.yml
+- name: Install GitLab
+  import_playbook: deploy_gitlab.yml
+- name: GitLab setup
+  import_playbook: gitlab_setup.yml
+...
