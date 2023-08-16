@@ -94,6 +94,8 @@ To send remote commands to Proxmox required to install Proxmoxer wrapper on the 
 
 `pip3 install openssh_wrapper`
 
+- *in case ot he error while installing proxmocer use command `apt install python3-proxmoxer`*
+
 ### Ansible installation.
 
 Ansible can be installed locally or using Python virtual environment. In the lab local installation was used on workstation with Debian 11 LXC container.
